@@ -18,7 +18,7 @@ router.post('/login/login', async (ctx) =>{
   if(!findRes){ return ctx.body={msg:'用户不存在请注册',status:422}}
   const validate = bcrypt.compareSync(password,findRes.password)
   if(!validate){ return ctx.body={msg:'账号或密码不正确',status:422}}
-  const token = jwb.sign({id:findRes._id,user:findRes.user},constant.SECRET,{expiresIn:'1h'})
+  const token = jwb.sign({id:findRes._id,user:findRes.user},constant.SECRET,{expiresIn:'600000'})
   ctx.body={msg:`欢迎${findRes.user}进入`,status:200,token}
 })
 const token = async (ctx,next)=>{

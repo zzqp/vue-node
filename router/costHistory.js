@@ -8,8 +8,29 @@ const constant = require('../utils/constant')
 const auth = async (ctx,next)=>{
   const token = String(ctx.headers.authorization||'').split(' ').pop()
   if(!token){return ctx.body = {msg:'token不存在',status:401}}
-  const {id} = jwb.verify(token,constant.SECRET)
-  const res = await Registered.findById(id)
+  const verifyRes = jwb.verify(token,constant.SECRET, (err, decoded) => {
+    if (err) {
+        console.log(err);
+        if(err.name == 'TokenExpiredError'){//token过期
+            let str = {
+                iat:1,
+                exp:0,
+                msg: 'token过期'
+            }
+            return str;
+        }else if(err.name == 'JsonWebTokenError'){//无效的token
+            let str = {
+                iat:1,
+                exp:0,
+                msg: '无效的token'
+            }
+            return str;
+        }
+    }else{
+        return decoded;
+    }
+})
+  const res = await Registered.findById(verifyRes.id)
   if(!res){ return ctx.body = {msg:'请先登录',status:401} }
   await next()
 } 

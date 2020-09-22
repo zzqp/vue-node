@@ -2,7 +2,8 @@ import axios from 'axios'
 import {Message} from 'element-ui'
 import router from './router/index'
 const http = axios.create({
-  baseURL:'http://localhost:3000/admin/api/'
+  baseURL:'http://127.0.0.1:3000/admin/api/'
+  // baseURL:'http://47.115.6.224:3000/admin/api/'
 })
 //请求拦截
 http.interceptors.request.use(config=>{

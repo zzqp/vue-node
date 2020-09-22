@@ -3,11 +3,41 @@ const Layer = require('../db/admin/Layer')
 const jwb = require('jsonwebtoken')
 const constant = require('../utils/constant')
 const Registered = require('../db/login/registered')
+// const auth = async (ctx,next)=>{
+//   const token = String(ctx.headers.authorization||'').split(' ').pop()
+//   if(!token){return ctx.body = {msg:'token不存在',status:401}}
+//   const verifyRes = jwb.verify(token,constant.SECRET)
+//   if(!verifyRes.iat<verifyRes.exp){return ctx.body = {msg:'token过期',status:401}}
+//   const res = await Registered.findById(verifyRes.id)
+//   if(!res){ return ctx.body = {msg:'请先登录',status:401} }
+//   await next()
+// } 
 const auth = async (ctx,next)=>{
   const token = String(ctx.headers.authorization||'').split(' ').pop()
   if(!token){return ctx.body = {msg:'token不存在',status:401}}
-  const {id} = jwb.verify(token,constant.SECRET)
-  const res = await Registered.findById(id)
+  const verifyRes = jwb.verify(token,constant.SECRET, (err, decoded) => {
+    if (err) {
+        console.log(err);
+        if(err.name == 'TokenExpiredError'){//token过期
+            let str = {
+                iat:1,
+                exp:0,
+                msg: 'token过期'
+            }
+            return str;
+        }else if(err.name == 'JsonWebTokenError'){//无效的token
+            let str = {
+                iat:1,
+                exp:0,
+                msg: '无效的token'
+            }
+            return str;
+        }
+    }else{
+        return decoded;
+    }
+})
+  const res = await Registered.findById(verifyRes.id)
   if(!res){ return ctx.body = {msg:'请先登录',status:401} }
   await next()
 } 
@@ -19,8 +49,8 @@ router.post('/rest/layer/add',auth,async ctx => {
 })
 // 查找楼层
 router.get('/rest/layer',auth,async ctx =>{
-  const items = await Layer.find().populate('parent').limit(3)
-  const res = await Layer.find().populate('parent').skip(3)
+  const items = await Layer.find({name:{$regex:'层'}}).populate('parent')
+  const res = await Layer.find({name:{$regex:'0'}}).populate('parent')
   ctx.body = {items,res}
 })
 // 查询楼层

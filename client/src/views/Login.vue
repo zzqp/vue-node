@@ -93,10 +93,9 @@ export default {
         if(!validate) return
         const res = await this.$http.post('login/login',this.model)
         if(res.data.status == 200) {
-          this.$message.success(res.data.msg)
-          this.$router.push('/home')
-          console.log('---');
           localStorage.setItem('token',res.data.token)
+          this.$message.success(res.data.msg)
+          this.$router.push('/')
         }
       })
     },

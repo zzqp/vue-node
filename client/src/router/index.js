@@ -10,6 +10,10 @@ Vue.use(VueRouter)
       meta:{isPublic:true}
     },
     {
+      path:'/',
+      redirect:'/home'
+    },
+    {
       path:'/home',
       component:()=>import('../views/Home'),
       children:[
@@ -29,7 +33,6 @@ Vue.use(VueRouter)
         {
           path:'/houseinfo/create',
           component:()=>import('../views/houseInfo/HouseInfo'),
-          meta:{keepAlive:true}
         },
         {
           path:'/houseinfo/list',
@@ -49,16 +52,14 @@ Vue.use(VueRouter)
 
   
   const router = new VueRouter({
-    mode:'history',
+    mode:'hash',
     routes
   })
   const isPublic=['/login']
   router.beforeEach((to,from,next)=>{
     if(localStorage.token){
         next()
-        console.log('token');
     }else{
-      console.log('no token');
       if(isPublic.indexOf(to.path) !=-1){
         next()
       }else{

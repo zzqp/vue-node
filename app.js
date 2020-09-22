@@ -7,6 +7,7 @@ require('./db/connect')//连接数据库
 app.use(require('koa2-cors')())//解决跨域问题
 
 app.use(static(__dirname + '/public'))//静态管理
+app.use(static(__dirname + '/dist'))//静态管理
 
 app.use(require('koa-bodyparser')())//post中间件
 
